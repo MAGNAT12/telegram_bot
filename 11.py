@@ -2,6 +2,7 @@ import telebot
 import sqlite3
 bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
 
+chat_states = {}
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -25,6 +26,16 @@ def start(message):
     else:
         bot.send_message(message.chat.id, "Вы уже зарегистрированны")
 
+@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'waiting_premium_response') 
+@bot.message_handler(commands=['premium'])
+def premium(message):
+    chat_states[message.chat.id] = 'waiting_premium_response'  # Устанавливаем состояние ожидания ответа пользователя
+    bot.send_message(message.chat.id, "Вы хотите купить премиум? Пожалуйста, вgit resetведите 'да' или 'нет'.")
+    if message.text.lower() == 'да':
+        bot.send_message(message.chat.id , "Поздравляем! Премиум успешно куплен!")
+    elif message.text.lower() == 'нет':
+        bot.send_message(message.chat.id, "Вы отказались от покупки премиума.")
+# Сбрасываем состояние чата
 
 @bot.message_handler()
 def get_user_text(message):
