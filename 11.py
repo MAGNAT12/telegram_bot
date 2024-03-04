@@ -26,17 +26,28 @@ def start(message):
     else:
         bot.send_message(message.chat.id, "Вы уже зарегистрированны")
 
-@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'waiting_premium_response') 
 @bot.message_handler(commands=['premium'])
 def premium(message):
-    chat_states[message.chat.id] = 'waiting_premium_response'  # Устанавливаем состояние ожидания ответа пользователя
-    bot.send_message(message.chat.id, "Вы хотите купить премиум? Пожалуйста, вgit resetведите 'да' или 'нет'.")
-    if message.text.lower() == 'да':
-        bot.send_message(message.chat.id , "Поздравляем! Премиум успешно куплен!")
-    elif message.text.lower() == 'нет':
-        bot.send_message(message.chat.id, "Вы отказались от покупки премиума.")
-# Сбрасываем состояние чата
+    chat_states[message.chat.id] = 'waiting_premium_response'
+    bot.send_message(message.chat.id, "Вы хотите купить премиум? Введите 'да' или 'нет'.")
 
+@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'waiting_premium_response')
+def process_premium(message):
+    if message.text.lower() == "да":
+        chat_states[message.chat.id] = 'waiting_activation_key'
+        bot.send_message(message.chat.id, "Введите ключ активации:")
+    elif message.text.lower() == "нет":
+        bot.send_message(message.chat.id, "Действие было отклонено")
+        chat_states[message.chat.id] = None
+
+@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'waiting_activation_key')
+def process_activation_key(message):
+    if message.text == "h5DB5RgwajZoN0K7azGX":
+        bot.send_message(message.chat.id, "Премиум успешно куплен!")
+    else:
+        bot.send_message(message.chat.id, "Неверный ключ активации.")
+    chat_states[message.chat.id] = None
+    
 @bot.message_handler()
 def get_user_text(message):
     if message.text == "Hello":
