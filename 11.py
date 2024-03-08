@@ -1,6 +1,7 @@
 import telebot
 import sqlite3
-bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
+import time
+bot = telebot.TeleBot('ваш токен')
 
 chat_states = {}
 
@@ -23,6 +24,7 @@ def start(message):
         user_id_str = str(user_id)
         cursor.execute("INSERT INTO login_id(id, name) VALUES(?, ?);", (user_id_str, user_name))
         connect.commit()
+
     else:
         bot.send_message(message.chat.id, "Вы уже зарегистрированны")
 
