@@ -2,7 +2,7 @@
 import telebot
 from random import randint
 
-bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
+bot = telebot.TeleBot('ваш токен ')
 
 
 @bot.message_handler(commands=['start'])
