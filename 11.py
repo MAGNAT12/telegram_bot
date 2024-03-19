@@ -1,7 +1,7 @@
 import telebot
 import sqlite3
 import time
-bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
+bot = telebot.TeleBot('ваш токен')
 
 chat_states = {}
 
