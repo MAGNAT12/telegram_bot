@@ -1,8 +1,10 @@
 # телеграм бот с ваирантом игра:
 import telebot
 from random import randint
+from token_1 import token
 
-bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
+
+bot = telebot.TeleBot(token)
 
 
 @bot.message_handler(commands=['start'])

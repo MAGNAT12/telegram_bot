@@ -1,19 +1,22 @@
 import telebot
 import sqlite3
-import time
-bot = telebot.TeleBot('6515489274:AAHF78K0FpDWjuaWI8LlTNJl-51Z5vHaCjg')
+from token_1 import token
+
+bot = telebot.TeleBot(token)
 
 chat_states = {}
+
+connect = sqlite3.connect('telebot.db', check_same_thread=False)
+cursor = connect.cursor()
+cursor.execute("""CREATE TABLE IF NOT EXISTS login_id(
+        id INTEGER PRIMARY KEY, name TEXT)""")
+connect.commit()
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
     ness = f'Здраствуйте, <b>{message.from_user.first_name}</b>'
     bot.send_message(message.chat.id, ness, parse_mode='html')
-    connect = sqlite3.connect('telebot.db')
-    cursor = connect.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS login_id(
-        id INTEGER PRIMARY KEY, name TEXT)""")
-    connect.commit()
     people_id = message.chat.id
     people_name = message.from_user.first_name
     cursor.execute(f"SELECT `id`, `name` FROM `login_id` WHERE `id` = {people_id} AND `name` = '{people_name}' ")
@@ -49,7 +52,19 @@ def process_activation_key(message):
     else:
         bot.send_message(message.chat.id, "Неверный ключ активации.")
     chat_states[message.chat.id] = None
-    
+
+@bot.message_handler(commands=['birth'])
+def birth(message):
+    name = "Азамат"
+    cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
+    result = cursor.fetchall()
+    if result:
+        bot.send_message(message.chat.id, "Человек найде")
+        bot.send_message(message.chat.id, "привет")
+    else:
+        bot.send_message(message.chat.id, "Человек не найде")
+
+        
 @bot.message_handler()
 def get_user_text(message):
     if message.text == "Hello":
