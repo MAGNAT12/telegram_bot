@@ -3,8 +3,8 @@ import telebot
 from random import randint
 from token_1 import token
 
-
 bot = telebot.TeleBot(token)
+
 
 
 @bot.message_handler(commands=['start'])

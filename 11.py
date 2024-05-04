@@ -4,6 +4,7 @@ from token_1 import token
 
 bot = telebot.TeleBot(token)
 
+
 chat_states = {}
 
 connect = sqlite3.connect('telebot.db', check_same_thread=False)
@@ -53,16 +54,16 @@ def process_activation_key(message):
         bot.send_message(message.chat.id, "Неверный ключ активации.")
     chat_states[message.chat.id] = None
 
-@bot.message_handler(commands=['birth'])
-def birth(message):
-    name = "Азамат"
-    cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
-    result = cursor.fetchall()
-    if result:
-        bot.send_message(message.chat.id, "Человек найде")
-        bot.send_message(message.chat.id, "привет")
-    else:
-        bot.send_message(message.chat.id, "Человек не найде")
+# @bot.message_handler(commands=['birth'])
+# def birth(message):
+#     name = "Азамат"
+#     cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
+#     result = cursor.fetchall()
+#     if result:
+#         bot.send_message(message.chat.id, "Человек найде")
+#         bot.send_message(message.chat.id, "привет")
+#     else:
+#         bot.send_message(message.chat.id, "Человек не найде")
 
         
 @bot.message_handler()
