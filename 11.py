@@ -4,15 +4,16 @@ from token_1 import token
 
 bot = telebot.TeleBot(token)
 
-
+# cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
 chat_states = {}
 
 connect = sqlite3.connect('telebot.db', check_same_thread=False)
 cursor = connect.cursor()
-cursor.execute("""CREATE TABLE IF NOT EXISTS login_id(
-        id INTEGER PRIMARY KEY, name TEXT)""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS 
+            login_id(
+        id INTEGER PRIMARY KEY, name TEXT
+            )""")
 connect.commit()
-
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -54,18 +55,28 @@ def process_activation_key(message):
         bot.send_message(message.chat.id, "Неверный ключ активации.")
     chat_states[message.chat.id] = None
 
-# @bot.message_handler(commands=['birth'])
-# def birth(message):
-#     name = "Азамат"
-#     cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
-#     result = cursor.fetchall()
-#     if result:
-#         bot.send_message(message.chat.id, "Человек найде")
-#         bot.send_message(message.chat.id, "привет")
-#     else:
-#         bot.send_message(message.chat.id, "Человек не найде")
+@bot.message_handler(commands=['birth'])
+def birth(message):
+    bot.send_message(message.chat.id, "Введите имя человека")
+    chat_states[message.chat.id] = "birth_name"
 
-        
+# Обработка имени
+@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'birth_name')
+def birth_name(message):
+    name = message.text.strip()
+    cursor.execute("SELECT id FROM login_id WHERE name = ?", (name,))
+    result = cursor.fetchone()
+
+    if result:
+        person_id = result[0] 
+        try:
+            bot.send_message(person_id, "Привет, как дела?")
+        except telebot.apihelper.ApiTelegramException as e:
+            bot.send_message(message.chat.id, f"Не удалось отправить сообщение: {e}")
+    else:
+        bot.send_message(message.chat.id, "Человек не найден.")
+
+
 @bot.message_handler()
 def get_user_text(message):
     if message.text == "Hello":
