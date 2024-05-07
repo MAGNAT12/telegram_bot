@@ -72,19 +72,32 @@ def birth_name(message):
     else:
         bot.send_message(message.chat.id, "Человек не найде")
 
-
 @bot.message_handler(commands=['message'])
 def messag(message):
     chat_states[message.chat.id] = 'message'
-    bot.send_message(message.chat.id, "Ввидите имя человека которома хотите написать")
+    bot.send_message(message.chat.id, "Введите имя человека, которому хотите написать")
 
 @bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'message')
 def messag_name(message):
-    name = message.text.strip()
-    cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
-    risult = cursor.fetchone()
-    name_message = message.from_user.first_name
-    bot.send_message(risult[0], f"Привет от {name_message}")
+    try:
+        name = message.text.strip()
+        cursor.execute("SELECT `id` FROM `login_id` WHERE `name` = ?", (name,))
+        result = cursor.fetchone()
+
+        if result:
+            name_message = message.from_user.first_name
+            recipient_id = result[0]
+
+            # Пытаемся отправить сообщение
+            bot.send_message(recipient_id, f"Привет от {name_message}")
+            bot.send_message(message.chat.id, "Сообщение успешно отправлено!")
+        else:
+            bot.send_message(message.chat.id, "Человек с таким именем не найден.")
+    except telebot.apihelper.ApiTelegramException as e:
+        if 'blocked by the user' in str(e):
+            bot.send_message(message.chat.id, "Пользователь заблокировал бота, не удалось отправить сообщение.")
+        else:
+            bot.send_message(message.chat.id, f"Не удалось отправить сообщение. Ошибка: {e}")
 
 
 

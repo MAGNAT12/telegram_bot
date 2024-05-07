@@ -3,3 +3,5 @@ test_api.py
 .pytest_cache
 token_1.py
 __pycache__
+telebot.db
+premium.db
