@@ -11,7 +11,8 @@ connect = sqlite3.connect('telebot.db', check_same_thread=False)
 cursor = connect.cursor()
 cursor.execute("""CREATE TABLE IF NOT EXISTS 
             login_id(
-        id INTEGER PRIMARY KEY, name TEXT
+        id INTEGER PRIMARY KEY, 
+        name TEXT
             )""")
 connect.commit()
 
@@ -57,25 +58,41 @@ def process_activation_key(message):
 
 @bot.message_handler(commands=['birth'])
 def birth(message):
-    bot.send_message(message.chat.id, "Введите имя человека")
+    bot.send_message(message.chat.id, "Ввидите имя человека")
     chat_states[message.chat.id] = "birth_name"
 
-# Обработка имени
 @bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'birth_name')
 def birth_name(message):
     name = message.text.strip()
-    cursor.execute("SELECT id FROM login_id WHERE name = ?", (name,))
-    result = cursor.fetchone()
-
-    if result:
-        person_id = result[0] 
-        try:
-            bot.send_message(person_id, "Привет, как дела?")
-        except telebot.apihelper.ApiTelegramException as e:
-            bot.send_message(message.chat.id, f"Не удалось отправить сообщение: {e}")
+    cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
+    risult = cursor.fetchone()
+    if risult:
+        bot.send_message(message.chat.id, "Человет найден")
+        chat_states[message.chat.id] = 'birth_name_messsge'
     else:
-        bot.send_message(message.chat.id, "Человек не найден.")
+        bot.send_message(message.chat.id, "Человек не найде")
 
+
+@bot.message_handler(commands=['message'])
+def messag(message):
+    chat_states[message.chat.id] = 'message'
+    bot.send_message(message.chat.id, "Ввидите имя человека которома хотите написать")
+
+@bot.message_handler(func=lambda message: chat_states.get(message.chat.id) == 'message')
+def messag_name(message):
+    name = message.text.strip()
+    cursor.execute("SELECT * FROM `login_id` WHERE `name` LIKE ?", (name,))
+    risult = cursor.fetchone()
+    name_message = message.from_user.first_name
+    bot.send_message(risult[0], f"Привет от {name_message}")
+
+
+
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id, "команда /start запускает бота")
+    bot.send_message(message.chat.id, "команда /premium вы можете купить премиум подписку\n(команда работа сособна но рашрения я пока не придумал)")
+    bot.send_message(message.chat.id, "команда /birth ищет человека только если в запустил бота \n(это не весь функционал в планах раширить его)")
 
 @bot.message_handler()
 def get_user_text(message):
