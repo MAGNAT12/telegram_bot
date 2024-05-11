@@ -1,7 +1,8 @@
 test_api.py
-.venv
+venv
 .pytest_cache
 token_1.py
 __pycache__
 telebot.db
 premium.db
+.vscode
